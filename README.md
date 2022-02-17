@@ -30,6 +30,10 @@ ScreenShots
 
 Documentation
 -------------
+
+```bash
+Database -> database/sylius_dev
+```
 Product Entity who cooperation with ProductColor
 
 ```bash
