@@ -1,85 +1,189 @@
-<p align="center">
-    <a href="https://sylius.com" target="_blank">
-        <img src="https://demo.sylius.com/assets/shop/img/logo.png" />
-    </a>
-</p>
 
-<h1 align="center">Sylius Standard Edition</h1>
 
-<p align="center">This is Sylius Standard Edition repository for starting new projects.</p>
+
+<h1 align="center">Sylius Task.<br> BitBag Academy</h1>
+
+
 
 About
 -----
 
-Sylius is the first decoupled eCommerce platform based on [**Symfony**](http://symfony.com) and [**Doctrine**](http://doctrine-project.org). 
-The highest quality of code, strong testing culture, built-in Agile (BDD) workflow and exceptional flexibility make it the best solution for application tailored to your business requirements. 
-Enjoy being an eCommerce Developer again!
+<p align="center">Set up store and add to product entity
+such a property as color (programmatically, of course, not clicking in the panel
+administrator as an attribute) with constants as fields for red, blue,
+green (select menu). The store admin should be able to choose
+this color when creating or updating a product in the admin panel and
+views in the product view on the store's website..</p>
 
-Powerful REST API allows for easy integrations and creating unique customer experience on any device.
-
-We're using full-stack Behavior-Driven-Development, with [phpspec](http://phpspec.net) and [Behat](http://behat.org)
+ScreenShots
+-----
+<p align="center">
+    <a href="https://sylius.com" target="_blank">
+        <img src="https://i.ibb.co/cDSJw06/2022-02-17-19h06-18.png" />
+    </a>
+</p>
+<p align="center">
+    <a href="https://sylius.com" target="_blank">
+        <img src="https://i.ibb.co/Bg5PHR1/2022-02-17-19h09-47.png" />
+    </a>
+</p>
 
 Documentation
 -------------
-
-Documentation is available at [docs.sylius.com](http://docs.sylius.com).
-
-Installation
-------------
+Product Entity who cooperation with ProductColor
 
 ```bash
-$ wget http://getcomposer.org/composer.phar
-$ php composer.phar create-project sylius/sylius-standard project
-$ cd project
-$ yarn install
-$ yarn build
-$ php bin/console sylius:install
-$ php bin/console server:start
-$ open http://localhost:8000/
+class Product extends BaseProduct
+{
+//Entity of color_id to BitBag Task
+    /**
+     * @var ColorInterface|null
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\ProductColor\Color", inversedBy="products")
+     * @ORM\JoinColumn(name="color_id", referencedColumnName="id")
+     */
+    private $color;
+
+    //Geters And Setters of Colors
+
+    public function getColor(): ?ColorInterface
+    {
+        return $this->color;
+    }
+
+    public function setColor(ColorInterface $color): void
+    {
+        $this->color = $color;
+    }
+}
+    //End Geters And Setters of color
 ```
-
-Troubleshooting
----------------
-
-If something goes wrong, errors & exceptions are logged at the application level:
-
+The Entity of Product Color
 ```bash
-$ tail -f var/log/prod.log
-$ tail -f var/log/dev.log
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="product_color")
+ */
+
+class Color implements ColorInterface
+{
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string")
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Product\Product", mappedBy="color_id")
+     */
+    private $products;
+
+
+
+
+    // Getters and setters for products
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): void
+    {
+        $this->name = $name;
+    }
+
+    // Getters for products
+    public function getProducts(): ?string
+    {
+        return $this->products;
+    }
+}
+```
+Interface Entity of Product Color
+```bash
+interface ColorInterface extends ResourceInterface
+{
+
+    public function getName(): ?string;
+
+    public function setName(?string $name): void;
+
+    public function getProducts(): ?string;
+}
 ```
 
-If you are using the supplied Vagrant development environment, please see the related [Troubleshooting guide](etc/vagrant/README.md#Troubleshooting) for more information.
+Preparing FormExtension which add to SyliusAdminBundle 
+```bash
+App/Form/Extension/ProductColorTypeExtension
+```
+```bash
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('color', EntityType::class, [
+                'class' => Color::class,
+                'choice_label'=> 'name',
+                'label' => 'Select product color',
+            ]);
+    }
+```
+<b>ADMIN VIEW: </b>Entity view visible to Store Admin with a choice of color
+```bash
+Templates/Bundles/SyliusAdminBundle/Product/tab/_details.html.twig
+```
+```bash
+ <!--Form of Product Color  -->
+<div>
+{{ form_row(form.color) }}
+</div>
+<!--end -->
+```
+<b>USER VIEW: </b>
+```bash
+Templates/Shop/productColor.html.twig
+```
+```bash
+<div class="ui product-color" id="product-color">
+    {% if product.color is null %}
+        <span>Color not been set</span>
+    {% else %}
+        <span class="bordered">{{ product.color.name }} </span>
+    {% endif %}
+</div>
 
-Contributing
-------------
+```
+View arrangement in yaml
+```bash
+Config/packages/productcolor_grid.yaml
+```
+```bash
+sylius_ui:
+    events:
+        sylius.shop.product.show.right_sidebar:
+            blocks:
+                product_color:
+                    template: 'Shop/ProductColor.html.twig'
+                    priority: 29
+```
 
-Would like to help us and build the most developer-friendly eCommerce platform? Start from reading our [Contribution Guide](https://docs.sylius.com/en/latest/contributing/)!
 
-Stay Updated
-------------
 
-If you want to keep up with the updates, [follow the official Sylius account on Twitter](http://twitter.com/Sylius) and [like us on Facebook](https://www.facebook.com/SyliusEcommerce/).
-
-Bug Tracking
-------------
-
-If you want to report a bug or suggest an idea, please use [GitHub issues](https://github.com/Sylius/Sylius/issues).
-
-Community Support
------------------
-
-Have a question? Join our [Slack](https://slackinvite.me/to/sylius-devs) or post it on [StackOverflow](http://stackoverflow.com) tagged with "sylius". You can also join our [group on Facebook](https://www.facebook.com/groups/sylius/)!
-
-MIT License
------------
-
-Sylius is completely free and released under the [MIT License](https://github.com/Sylius/Sylius/blob/master/LICENSE).
-
-Authors
--------
-
-Sylius was originally created by [Paweł Jędrzejewski](http://pjedrzejewski.com).
-See the list of [contributors from our awesome community](https://github.com/Sylius/Sylius/contributors).
-# acme1
-# ecommerce
-# ecommerce

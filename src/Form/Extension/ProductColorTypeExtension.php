@@ -20,6 +20,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class ProductColorTypeExtension extends AbstractTypeExtension
 {
 
+//This is the form of Product Color who exists in AdminPanel in Product Section.
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder

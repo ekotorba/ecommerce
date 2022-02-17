@@ -17,8 +17,11 @@
                         {{ form_row(form.options) }}
                         {{ form_row(form.variantSelectionMethod) }}
                     {% endif %}
-                    {{ form_row(form.color) }}
-
+                    <!--Form of Product Color  -->
+                    <div>
+                        {{ form_row(form.color) }}
+                    </div>
+                    <!--end -->
                     {# Nothing to see here. #}
                     <div class="ui hidden element">
                         {% if product.simple %}
@@ -31,6 +34,7 @@
             <div class="column">
                 {{ form_row(form.channels) }}
             </div>
+
         </div>
         {% if product.simple %}
             <div class="ui one column stackable grid">
@@ -38,6 +42,7 @@
                     <h4 class="ui dividing header">{{ 'sylius.ui.pricing'|trans }}</h4>
                     {% include "@SyliusAdmin/Product/_channel_pricing.html.twig" with { product: product, variantForm: form.variant } only %}
                 </div>
+
             </div>
         {% endif %}
         <div class="ui hidden divider"></div>

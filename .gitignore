@@ -41,9 +41,9 @@
 !/config/jwt/*-test.pem
 ###< lexik/jwt-authentication-bundle ###
 
-###> friendsofphp/php-cs-fixer ###
+###> sylius ###
 .idea/
 .env
 .env.*
 .editorconfig
-###> friendsofphp/php-cs-fixer ###
+###> sylius ###
